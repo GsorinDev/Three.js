@@ -7,13 +7,12 @@ import * as dat from 'dat.gui'
 
 const raycaster = new THREE.Raycaster()
 const points = [{
-    // 'Contact' button
-    position: new THREE.Vector3(-7, 8.2, -3.2),
+    // 'Test' button
+
+    position: new THREE.Vector3(-7, 8.7, -2.8),
     element: document.querySelector('.point-1')
     }
 ]
-
-
 
 // Canvas
 const canvas = document.querySelector('.webgl')
@@ -89,13 +88,18 @@ renderer.setSize(sizes.width, sizes.height)
 renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
 renderer.shadowMap.enabled = true
 renderer.gammaOuput = true
+
+
 /**
  * Animate
  */
-
-
-
 const clock = new THREE.Clock()
+
+const modal = document.querySelector(".modal")
+
+modal.addEventListener("click", e => {
+    modal.style.display = "none"
+})
 
 const tick = () =>
 {
@@ -103,9 +107,17 @@ const tick = () =>
     controls.update()
 
     if (sceneReady) {
-    
         // Go through each point
         for (const point of points) {
+
+            point.element.addEventListener('click', function() {
+                point.element.classList.add('clicked');
+                modal.style.display = "flex"
+            });
+            point.element.addEventListener('animationend', function() {
+                point.element.classList.remove('clicked');
+            });
+
             const screenPosition = point.position.clone()
             screenPosition.project(camera)
     
@@ -115,21 +127,22 @@ const tick = () =>
             if (intersects.length === 0) {
             point.element.classList.add('visible')
             } else {
-            const intersectionDistance = intersects[0].distance
-            const pointDistance = point.position.distanceTo(camera.position)
+                const intersectionDistance = intersects[0].distance
+                const pointDistance = point.position.distanceTo(camera.position)
     
-            if (intersectionDistance < pointDistance) {
-                point.element.classList.remove('visible')
-            } else {
-                point.element.classList.add('visible')
+                if (intersectionDistance < pointDistance) {
+                    point.element.classList.remove('visible')
+                } else {
+                    point.element.classList.add('visible')
+                }
             }
-            }
-    
-          const translateX = screenPosition.x * sizes.width * 0.5
-          const translateY = -screenPosition.y * sizes.height * 0.5
-            point.element.style.transform = `translate(${translateX}px, ${translateY}px)`
+            const translateX = screenPosition.x * sizes.width * 0.5
+            const translateY = -screenPosition.y * sizes.height * 0.5
+
+
+            point.element.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`
         }
-      }
+    }
     renderer.render(scene, camera)
 
     // Call tick again on the next frame
