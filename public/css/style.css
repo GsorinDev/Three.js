@@ -61,6 +61,12 @@ body
     }
 }
 
+@keyframes scaling {
+    100% {
+        transform: scale(0);
+    }
+}
+
 .modal {
     display: none;
     position: absolute;

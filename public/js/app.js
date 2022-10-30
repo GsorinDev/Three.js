@@ -3,12 +3,11 @@ import * as THREE from 'three'
 import {GLTFLoader} from "three/examples/jsm/loaders/GLTFLoader";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 import * as dat from 'dat.gui'
-
+import gsap from 'gsap'
 
 const raycaster = new THREE.Raycaster()
 const points = [{
     // 'Test' button
-
     position: new THREE.Vector3(-7, 8.7, -2.8),
     element: document.querySelector('.point-1')
     }
@@ -101,6 +100,8 @@ modal.addEventListener("click", e => {
     modal.style.display = "none"
 })
 
+const cameraPosition = camera.position
+
 const tick = () =>
 {
     // Update Orbital Controls
@@ -109,14 +110,32 @@ const tick = () =>
     if (sceneReady) {
         // Go through each point
         for (const point of points) {
-
             point.element.addEventListener('click', function() {
                 point.element.classList.add('clicked');
-                modal.style.display = "flex"
-            });
-            point.element.addEventListener('animationend', function() {
-                point.element.classList.remove('clicked');
-            });
+                setTimeout( () => {
+                    point.element.classList.remove('clicked');
+                    point.element.style.display = "none"
+                    }, 2300)
+
+                controls.enableRotate = false
+                controls.enableZoom = false
+
+                gsap.to(camera.position, { duration: 2.5, ease: "power1.inOut",
+                    x: -5,
+                    y: 8.7,
+                    z: -2.8})
+
+                gsap.to(controls.target, { duration: 2.5, ease: "power1.inOut",
+                    x: -7,
+                    y: 8.7,
+                    z: -2.8})
+                });
+
+                // setTimeout( () => {
+                //     modal.style.display = "flex"
+                // }, 3800)
+
+
 
             const screenPosition = point.position.clone()
             screenPosition.project(camera)
@@ -125,7 +144,7 @@ const tick = () =>
             const intersects = raycaster.intersectObjects(scene.children, true)
     
             if (intersects.length === 0) {
-            point.element.classList.add('visible')
+                point.element.classList.add('visible')
             } else {
                 const intersectionDistance = intersects[0].distance
                 const pointDistance = point.position.distanceTo(camera.position)
@@ -140,7 +159,7 @@ const tick = () =>
             const translateY = -screenPosition.y * sizes.height * 0.5
 
 
-            point.element.style.transform = `translate(${translateX}px, ${translateY}px) scale(1)`
+            point.element.style.transform = `translate(${translateX}px, ${translateY}px)`
         }
     }
     renderer.render(scene, camera)
